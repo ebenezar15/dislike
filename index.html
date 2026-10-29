@@ -1,0 +1,471 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Courage Map</title>
+<style>
+:root{
+  --bg:#f6f4ef;--card:#fff;--ink:#1d2330;--muted:#5d6676;--line:#d9d4c8;
+  --n1:#e0603a;--n2:#d99a1e;--n3:#2f9e6e;--n4:#2f7fc1;--n5:#8a5cc7;--rw:#c2407a;
+  --soft:#efeadf;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#14171d;--card:#1d222b;--ink:#e8e9ec;--muted:#9aa3b2;--line:#323946;--soft:#252b36;}}
+:root[data-theme="dark"]{--bg:#14171d;--card:#1d222b;--ink:#e8e9ec;--muted:#9aa3b2;--line:#323946;--soft:#252b36;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+header{position:sticky;top:0;z-index:5;background:var(--bg);border-bottom:1px solid var(--line)}
+.bar{max-width:1100px;margin:auto;padding:10px 16px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.bar h1{font-size:18px;margin:0;flex:1;min-width:160px}
+.prog{font-size:13px;color:var(--muted)}
+nav{max-width:1100px;margin:auto;padding:0 16px 8px;display:flex;gap:6px;overflow-x:auto}
+nav button,.btn{border:1px solid var(--line);background:var(--card);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer;font:inherit;font-size:14px;white-space:nowrap}
+nav button.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.btn:hover,nav button:hover{border-color:var(--ink)}
+main{max-width:1100px;margin:auto;padding:20px 16px 60px}
+section{display:none}section.on{display:block}
+h2{font-size:26px;margin:.2em 0 .3em}h3{margin:1.2em 0 .4em}
+.lead{color:var(--muted);max-width:720px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px}
+.grid{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+svg{max-width:100%;height:auto;display:block}
+svg text{fill:var(--ink);font-family:inherit}
+.node{cursor:pointer}.node:hover rect,.node:hover circle{stroke-width:3}
+.pill{display:inline-block;font-size:12px;padding:2px 8px;border-radius:999px;color:#fff;font-weight:600}
+.tabs2{display:flex;gap:6px;flex-wrap:wrap;margin:10px 0 16px}
+.vs{display:grid;grid-template-columns:1fr auto 1fr;gap:10px;align-items:stretch}
+.vs .card{min-height:100%}.vs .mid{align-self:center;font-weight:700;color:var(--muted)}
+@media(max-width:640px){.vs{grid-template-columns:1fr}.vs .mid{text-align:center}}
+details{border:1px solid var(--line);border-radius:10px;padding:10px 14px;background:var(--card);margin:8px 0}
+summary{cursor:pointer;font-weight:600}
+.rw{border-left:4px solid var(--rw);background:var(--soft);padding:12px 14px;border-radius:8px;margin:14px 0}
+.rw b{color:var(--rw)}
+.flow{display:flex;flex-direction:column;align-items:center;gap:0}
+.fbox{background:var(--card);border:2px solid var(--line);border-radius:12px;padding:14px 18px;max-width:560px;width:100%;text-align:center}
+.arrow{width:2px;height:22px;background:var(--line)}
+.choices{display:flex;gap:10px;justify-content:center;margin-top:10px;flex-wrap:wrap}
+.flash{perspective:1000px;height:200px;cursor:pointer}
+.flash .in{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.flash.flip .in{transform:rotateY(180deg)}
+.flash .f,.flash .b{position:absolute;inset:0;backface-visibility:hidden;border-radius:14px;display:flex;align-items:center;justify-content:center;padding:20px;text-align:center;border:1px solid var(--line)}
+.flash .f{background:var(--card);font-size:20px;font-weight:700}
+.flash .b{background:var(--soft);transform:rotateY(180deg)}
+.q{margin:12px 0}.q .opt{display:block;width:100%;text-align:left;margin:6px 0;border-radius:10px}
+.opt.ok{background:#2f9e6e;color:#fff;border-color:#2f9e6e}.opt.no{background:#e0603a;color:#fff;border-color:#e0603a}
+.chk{display:flex;gap:10px;align-items:flex-start;margin:8px 0}
+.chk input{width:20px;height:20px;margin-top:2px}
+textarea{width:100%;min-height:70px;border-radius:10px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;padding:10px}
+.sort{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.zone{min-height:120px;border:2px dashed var(--line);border-radius:12px;padding:10px}
+.chip{display:inline-block;margin:4px;padding:6px 10px;border-radius:999px;border:1px solid var(--line);background:var(--card);cursor:pointer;font-size:14px}
+.chip.sel{outline:3px solid var(--n4)}
+.muted{color:var(--muted);font-size:14px}
+.ladder div{padding:10px 14px;border-radius:10px;color:#fff;margin:6px 0;font-weight:600}
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>🧭 The Courage Map <span class="muted">— an interactive study guide</span></h1>
+    <span class="prog" id="prog">0 / 5 nights done</span>
+    <button class="btn" id="theme" aria-label="Toggle theme">◐</button>
+  </div>
+  <nav id="nav"></nav>
+</header>
+<main>
+
+<!-- ================= OVERVIEW ================= -->
+<section id="home" class="on">
+  <h2>Big picture: five nights, one journey</h2>
+  <p class="lead">The book is a dialogue between a skeptical young man and a philosopher over five nights. Each night builds on the last, moving from <b>"my past decides me"</b> to <b>"I can live fully, right now"</b>. Click any night on the map to study it.</p>
+  <div class="card">
+  <svg viewBox="0 0 1000 330" id="journey" role="img" aria-label="Journey map of five nights">
+    <path d="M60 260 C 200 260, 200 90, 320 120 S 480 280, 560 200 S 720 60, 800 110 S 920 240, 950 90" fill="none" stroke="var(--line)" stroke-width="6" stroke-dasharray="2 12" stroke-linecap="round"/>
+  </svg>
+  </div>
+  <h3>The core thread</h3>
+  <svg viewBox="0 0 1000 140" role="img" aria-label="Core thread flow">
+    <defs><marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs>
+    <g font-size="15" text-anchor="middle">
+      <rect x="10" y="35" width="170" height="70" rx="12" fill="var(--n1)"/><text x="95" y="65" style="fill:#fff" font-weight="700">Goals, not causes</text><text x="95" y="87" style="fill:#fff" font-size="13">You can change</text>
+      <rect x="210" y="35" width="170" height="70" rx="12" fill="var(--n2)"/><text x="295" y="65" style="fill:#fff" font-weight="700">It's all relationships</text><text x="295" y="87" style="fill:#fff" font-size="13">Stop competing</text>
+      <rect x="410" y="35" width="170" height="70" rx="12" fill="var(--n3)"/><text x="495" y="65" style="fill:#fff" font-weight="700">Separate tasks</text><text x="495" y="87" style="fill:#fff" font-size="13">Freedom to be disliked</text>
+      <rect x="610" y="35" width="170" height="70" rx="12" fill="var(--n4)"/><text x="695" y="65" style="fill:#fff" font-weight="700">Community feeling</text><text x="695" y="87" style="fill:#fff" font-size="13">Horizontal bonds</text>
+      <rect x="810" y="35" width="170" height="70" rx="12" fill="var(--n5)"/><text x="895" y="65" style="fill:#fff" font-weight="700">Here &amp; now</text><text x="895" y="87" style="fill:#fff" font-size="13">Contribution = happiness</text>
+      <g stroke="var(--muted)" stroke-width="2" marker-end="url(#ar)"><line x1="182" y1="70" x2="206" y2="70"/><line x1="382" y1="70" x2="406" y2="70"/><line x1="582" y1="70" x2="606" y2="70"/><line x1="782" y1="70" x2="806" y2="70"/></g>
+    </g>
+  </svg>
+  <div class="grid" style="margin-top:16px">
+    <div class="card"><b>Who is "Adler"?</b><p class="muted">Alfred Adler — the "third giant" of psychology beside Freud and Jung. His school is called <i>Individual Psychology</i>: the person is an indivisible whole that moves toward goals.</p></div>
+    <div class="card"><b>The method</b><p class="muted">Socratic dialogue: the youth objects, the philosopher answers. Study tip — try to argue the youth's side, then answer it yourself.</p></div>
+    <div class="card" style="border-color:var(--rw)"><b style="color:var(--rw)">🔌 Re-wiring track</b><p class="muted">Each night ends with a pink "Re-wire" box linking the idea to habit change and neuroplasticity — how to actually practise it until it becomes automatic. See the <b>Re-wire Lab</b> tab too.</p></div>
+  </div>
+</section>
+
+<!-- ================= NIGHTS (filled by JS) ================= -->
+<section id="nights">
+  <div class="tabs2" id="nightTabs"></div>
+  <div id="nightBody"></div>
+</section>
+
+<!-- ================= CONCEPT MAP ================= -->
+<section id="map">
+  <h2>Concept map</h2>
+  <p class="lead">Every key idea and how they connect. Click a bubble to see its meaning and the ideas it links to.</p>
+  <div class="card"><svg viewBox="0 0 1000 620" id="cmap" role="img" aria-label="Concept map"></svg></div>
+  <div class="card" id="cinfo" style="margin-top:12px"><span class="muted">Select a concept…</span></div>
+</section>
+
+<!-- ================= TOOLS ================= -->
+<section id="tools">
+  <h2>Interactive tools</h2>
+  <p class="lead">Practise the two most practical ideas in the book.</p>
+  <h3>① "Whose task is this?" — decision flowchart</h3>
+  <div class="card"><div class="flow" id="taskFlow"></div></div>
+  <h3>② Sorting game: my task or theirs?</h3>
+  <p class="muted">Tap a situation, then tap the zone it belongs to.</p>
+  <div class="card">
+    <div id="pool"></div>
+    <div class="sort" style="margin-top:10px">
+      <div class="zone" data-z="me"><b>🙋 My task</b><div></div></div>
+      <div class="zone" data-z="them"><b>👥 Their task</b><div></div></div>
+    </div>
+    <p id="sortMsg" class="muted"></p><button class="btn" id="sortReset">Reset</button>
+  </div>
+  <h3>③ Etiology vs Teleology reframer</h3>
+  <div class="card">
+    <p class="muted">Write an "I can't because of my past…" sentence. The reframer turns it into a goal-based question.</p>
+    <textarea id="reIn" placeholder="e.g. I can't speak up in meetings because I was bullied at school."></textarea>
+    <button class="btn" id="reBtn" style="margin-top:8px">Reframe →</button>
+    <div id="reOut" style="margin-top:10px"></div>
+  </div>
+</section>
+
+<!-- ================= REWIRE LAB ================= -->
+<section id="rewire">
+  <h2>🔌 Re-wire Lab</h2>
+  <p class="lead">Ideas change nothing until they are practised. The brain strengthens the paths it uses often ("neurons that fire together wire together"). This lab turns the book's ideas into repeatable reps.</p>
+  <div class="card">
+  <svg viewBox="0 0 1000 300" role="img" aria-label="Re-wiring loop">
+    <g text-anchor="middle" font-size="15">
+      <circle cx="500" cy="150" r="118" fill="none" stroke="var(--rw)" stroke-width="3" stroke-dasharray="6 8"/>
+      <text x="500" y="145" font-weight="700" font-size="18">Re-wiring</text><text x="500" y="168" class="muted" style="fill:var(--muted)">loop</text>
+      <g><rect x="420" y="6" width="160" height="50" rx="12" fill="var(--n1)"/><text x="500" y="37" style="fill:#fff" font-weight="700">1 · Notice</text></g>
+      <g><rect x="640" y="125" width="170" height="50" rx="12" fill="var(--n3)"/><text x="725" y="156" style="fill:#fff" font-weight="700">2 · Name the goal</text></g>
+      <g><rect x="420" y="244" width="160" height="50" rx="12" fill="var(--n4)"/><text x="500" y="275" style="fill:#fff" font-weight="700">3 · Choose anew</text></g>
+      <g><rect x="190" y="125" width="170" height="50" rx="12" fill="var(--n5)"/><text x="275" y="156" style="fill:#fff" font-weight="700">4 · Repeat &amp; reflect</text></g>
+      <text x="840" y="60" style="fill:var(--muted)" font-size="13">"What is this feeling for?"</text>
+      <text x="160" y="250" style="fill:var(--muted)" font-size="13">Small reps &gt; big intentions</text>
+    </g>
+  </svg>
+  </div>
+  <div class="grid" style="margin-top:14px">
+    <div class="card"><span class="pill" style="background:var(--n1)">Notice</span><p>Catch the automatic thought: <i>"I'm like this because…"</i>. Awareness interrupts the old circuit.</p></div>
+    <div class="card"><span class="pill" style="background:var(--n3)">Name the goal</span><p>Ask what the reaction is <i>for</i>. Avoiding risk? Winning? Being noticed?</p></div>
+    <div class="card"><span class="pill" style="background:var(--n4)">Choose anew</span><p>Pick one small, different action that serves a better goal (contribution, honesty, courage).</p></div>
+    <div class="card"><span class="pill" style="background:var(--n5)">Repeat</span><p>New paths feel awkward at first. Repetition over weeks makes them the default.</p></div>
+  </div>
+  <h3>21-day micro-practice tracker</h3>
+  <p class="muted">One tiny rep a day. Tick each day you did it (saved in this browser).</p>
+  <div class="card" id="days" style="display:flex;flex-wrap:wrap;gap:6px"></div>
+  <h3>Daily re-wiring checklist</h3>
+  <div class="card" id="daily"></div>
+  <h3>Reflection journal</h3>
+  <div class="card">
+    <p class="muted" id="prompt"></p>
+    <textarea id="journal" placeholder="Write freely…"></textarea>
+    <button class="btn" id="newPrompt" style="margin-top:8px">New prompt ↻</button>
+  </div>
+</section>
+
+<!-- ================= STUDY ================= -->
+<section id="study">
+  <h2>Study & self-test</h2>
+  <div class="tabs2"><button class="btn" id="modeF">🃏 Flashcards</button><button class="btn" id="modeQ">✅ Quiz</button></div>
+  <div id="fWrap">
+    <div class="flash" id="flash"><div class="in"><div class="f" id="ff"></div><div class="b" id="fb"></div></div></div>
+    <div style="display:flex;gap:8px;justify-content:center;margin-top:10px">
+      <button class="btn" id="fPrev">←</button><span class="muted" id="fNum" style="align-self:center"></span><button class="btn" id="fNext">→</button><button class="btn" id="fShuf">Shuffle</button>
+    </div>
+    <p class="muted" style="text-align:center">Tap the card to flip.</p>
+  </div>
+  <div id="qWrap" style="display:none"></div>
+</section>
+
+</main>
+
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const store={get(k,d){try{return JSON.parse(localStorage.getItem('cm_'+k))??d}catch(e){return d}},set(k,v){try{localStorage.setItem('cm_'+k,JSON.stringify(v))}catch(e){}}};
+const C=['var(--n1)','var(--n2)','var(--n3)','var(--n4)','var(--n5)'];
+
+/* ---------- theme ---------- */
+$('#theme').onclick=()=>{const r=document.documentElement,d=r.dataset.theme==='dark'||(!r.dataset.theme&&matchMedia('(prefers-color-scheme:dark)').matches);r.dataset.theme=d?'light':'dark';store.set('theme',r.dataset.theme)};
+if(store.get('theme'))document.documentElement.dataset.theme=store.get('theme');
+
+/* ---------- nav ---------- */
+const tabs=[['home','🗺️ Overview'],['nights','🌙 Five Nights'],['map','🕸️ Concept Map'],['tools','🛠️ Tools'],['rewire','🔌 Re-wire Lab'],['study','🎓 Study']];
+tabs.forEach(([id,l])=>{const b=document.createElement('button');b.textContent=l;b.dataset.t=id;b.onclick=()=>go(id);$('#nav').append(b)});
+function go(id){$$('section').forEach(s=>s.classList.toggle('on',s.id===id));$$('nav button').forEach(b=>b.classList.toggle('on',b.dataset.t===id));scrollTo(0,0)}
+go('home');
+
+/* ---------- content ---------- */
+const N=[
+{t:'Deny Trauma',sub:'Your past does not decide you',
+ big:'People are not driven by past causes but move toward present goals. So anyone can change, starting now.',
+ vs:{l:['Etiology (Freud)','Past cause → present effect.','"I can\'t go out because I was hurt as a child."'],r:['Teleology (Adler)','Present goal → chosen behaviour.','"I create anxiety so that I don\'t have to go out."']},
+ diagram:'teleo',
+ keys:[
+ ['Trauma does not exist (as a cause)','Experiences don\'t determine us; the <b>meaning</b> we give them does. We are self-determined by the meaning we assign.'],
+ ['Anger is fabricated','Anger is a tool chosen to reach a goal (e.g. to dominate). It can be chosen — and dropped.'],
+ ['Lifestyle','Your "personality" is a lifestyle — your way of seeing the world and yourself. It was chosen, so it can be re-chosen.'],
+ ['People choose not to change','Staying the same is safe and predictable. Change takes courage, so we invent reasons not to.'],
+ ['Unhappiness is chosen','At some level you judged unhappiness to be "good" for you — it protects or serves a goal.'],
+ ['Life is decided here and now','What happened before has no bearing on how you live from this moment.']],
+ rw:'Every time you think "because of my past…", pause and ask <i>"What is this for?"</i> Naming the hidden goal weakens the old automatic loop; repeating the new question builds a new one.'},
+{t:'All Problems Are Interpersonal',sub:'Inferiority, competition & life tasks',
+ big:'All our worries are rooted in relationships with others. Feeling inferior is normal and useful; turning it into a complex or a competition is what hurts.',
+ vs:{l:['Feeling of inferiority','A healthy push: "I want to grow beyond my current self."','Compared with your ideal self.'],r:['Inferiority complex','An excuse: "Because of A, I can\'t do B."','Compared with others → competition.']},
+ diagram:'inferior',
+ keys:[
+ ['Inferiority is subjective','It is a value judgement, not a fact. You can change what your traits mean.'],
+ ['Superiority complex','Bragging, flaunting authority or even "misfortune" — acting superior to hide feeling inferior.'],
+ ['Life is not a competition','Walk on a flat plane: everyone moves forward, none ahead or behind. Others become comrades, not enemies.'],
+ ['Power struggle → revenge','When someone provokes you, don\'t enter the fight. Admitting fault is not defeat.'],
+ ['Three life tasks','<b>Work</b>, <b>friendship</b>, <b>love</b> — increasing in depth and difficulty.'],
+ ['Life-lie','Using excuses to avoid life tasks — blaming others or circumstances.'],
+ ['Red string vs chains','Relationships should be free and loose, not rigid. Feel freedom in love, not control.']],
+ rw:'Swap the "compare to others" circuit for "compare to yesterday-me". Keep a tiny log: <i>"One thing I did better than last week."</i> Repetition retrains attention from rank to growth.'},
+{t:'Discard Other People\'s Tasks',sub:'Separation of tasks & freedom',
+ big:'Don\'t live to meet others\' expectations. Ask "whose task is this?" — the one who receives the result owns it. Don\'t intrude, don\'t let others intrude.',
+ vs:{l:['Living for recognition','Seeking praise → living someone else\'s life.','Never free.'],r:['Separation of tasks','Do your best; how others judge you is their task.','Free — even if disliked.']},
+ diagram:'tasks',
+ keys:[
+ ['Deny the desire for recognition','Seeking approval means living by other people\'s rules.'],
+ ['Who receives the result?','That decides whose task it is. E.g. a child\'s studying is the child\'s task.'],
+ ['"You can lead a horse to water…"','Offer support and be available, but you cannot force someone to drink.'],
+ ['Cut the Gordian knot','Cut entanglements sharply rather than slowly untying them — separate tasks clearly.'],
+ ['Freedom is being disliked','Being disliked by someone is proof you live freely. It\'s the cost of freedom.'],
+ ['You hold the cards','You can change a relationship — by changing yourself. No one else needs to change first.']],
+ rw:'Build a 3-second gate before you people-please: <i>"Whose result is this?"</i> If it\'s theirs, practise a kind "No" or simply step back. Each rep makes boundaries feel less scary.'},
+{t:'Where the Center of the World Is',sub:'Community feeling & horizontal relationships',
+ big:'You are not the centre of the world but a part of it. The goal of relationships is community feeling: seeing others as comrades and feeling "I have a place here."',
+ vs:{l:['Vertical relationship','Praise & rebuke; above/below; manipulation.','"Good job" from the top.'],r:['Horizontal relationship','Encouragement & gratitude; equal but different.','"Thank you, that helped."']},
+ diagram:'circles',
+ keys:[
+ ['Holism','A person is an indivisible whole — mind and body, reason and emotion, cannot be split.'],
+ ['Community feeling','The goal: from self-interest to interest in others. Community spans family to the whole universe.'],
+ ['Listen to a larger community','When one group rejects you, remember there are larger ones. You belong beyond it.'],
+ ['Do not rebuke or praise','Both are vertical judgements from above. They create dependence.'],
+ ['Encouragement approach','Say "thank you", share joy — build courage horizontally.'],
+ ['Value through contribution','People feel worth when they feel useful to someone — even just by existing.']],
+ rw:'Replace "good job" with "thank you" for one week. Gratitude is a different neural route than evaluation — it lowers status-threat in both people and makes horizontal habits automatic.'},
+{t:'Live in Earnest Here & Now',sub:'Self-acceptance, confidence, contribution',
+ big:'Happiness is the feeling of contribution. Accept yourself, trust others unconditionally, contribute — and live life as a series of moments, like a dance.',
+ vs:{l:['Life as a line','Climbing to a summit; the journey is "not yet" real.','Happiness postponed.'],r:['Life as dots (moments)','Each moment complete; like dancing.','Happiness now.']},
+ diagram:'triad',
+ keys:[
+ ['Self-acceptance ≠ self-affirmation','Not "I can do it!" but accepting "I can\'t yet" honestly — and moving forward.'],
+ ['Confidence in others','Trust unconditionally (not credit with conditions). Betrayal is their task.'],
+ ['Contribution to others','Work\'s essence is contributing to the common good. The feeling of contribution is enough.'],
+ ['Workaholism is a life-lie','Using one task (work) to avoid the others (friendship, love).'],
+ ['Courage to be normal','No need to be special — either specially good or specially bad.'],
+ ['Shine light on here & now','Past and future are dark; light up the present moment.'],
+ ['The guiding star','"Contribution to others" — a star to steer by, giving meaning to life.']],
+ rw:'End each day by naming one moment you contributed (big or tiny). Repeatedly noticing contribution rewires the brain\'s "reward" cue away from approval toward usefulness — the book\'s formula for happiness.'}
+];
+
+/* ---------- journey map ---------- */
+const pts=[[60,260],[320,120],[560,200],[800,110],[950,90]];
+const done=store.get('done',[]);
+function drawJourney(){
+ const s=$('#journey');s.querySelectorAll('g.node').forEach(e=>e.remove());
+ N.forEach((n,i)=>{const [x,y]=pts[i];const g=document.createElementNS('http://www.w3.org/2000/svg','g');g.classList.add('node');
+  g.innerHTML=`<circle cx="${x}" cy="${y}" r="34" fill="${C[i]}" stroke="var(--ink)" stroke-width="${done.includes(i)?3:0}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="22" font-weight="800" style="fill:#fff">${done.includes(i)?'✓':i+1}</text><text x="${x}" y="${y+(i%2?-46:56)}" text-anchor="middle" font-size="15" font-weight="700">Night ${i+1}</text><text x="${x}" y="${y+(i%2?-28:74)}" text-anchor="middle" font-size="13" style="fill:var(--muted)">${n.t}</text>`;
+  g.onclick=()=>{go('nights');showNight(i)};s.append(g)});
+ $('#prog').textContent=`${done.length} / 5 nights done`;
+}
+drawJourney();
+
+/* ---------- night diagrams ---------- */
+const D={
+teleo:`<svg viewBox="0 0 900 260"><defs><marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10z" fill="var(--muted)"/></marker></defs><g font-size="15" text-anchor="middle">
+<text x="220" y="24" font-weight="700">Etiology: pushed from behind</text>
+<rect x="20" y="50" width="150" height="56" rx="10" fill="var(--soft)" stroke="var(--line)"/><text x="95" y="83">Past event</text>
+<rect x="270" y="50" width="150" height="56" rx="10" fill="var(--soft)" stroke="var(--line)"/><text x="345" y="83">Present "me"</text>
+<line x1="172" y1="78" x2="266" y2="78" stroke="var(--muted)" stroke-width="2" marker-end="url(#a2)"/><text x="220" y="70" font-size="12" style="fill:var(--muted)">causes</text>
+<text x="680" y="24" font-weight="700">Teleology: pulled by a goal</text>
+<rect x="480" y="50" width="150" height="56" rx="10" fill="var(--n1)"/><text x="555" y="83" style="fill:#fff">Present "me"</text>
+<rect x="730" y="50" width="150" height="56" rx="10" fill="var(--n1)"/><text x="805" y="83" style="fill:#fff">Goal</text>
+<line x1="632" y1="78" x2="726" y2="78" stroke="var(--n1)" stroke-width="3" marker-end="url(#a2)"/><text x="680" y="70" font-size="12" style="fill:var(--muted)">moves toward</text>
+<rect x="480" y="150" width="400" height="80" rx="12" fill="none" stroke="var(--n1)" stroke-dasharray="5 5"/><text x="680" y="182">Past experience = raw material.</text><text x="680" y="206">The <tspan font-weight="700">meaning</tspan> I give it is my choice.</text>
+<rect x="20" y="150" width="400" height="80" rx="12" fill="none" stroke="var(--line)" stroke-dasharray="5 5"/><text x="220" y="182" style="fill:var(--muted)">"I'm stuck — it's determined."</text><text x="220" y="206" style="fill:var(--muted)">No room to change.</text></g></svg>`,
+inferior:`<svg viewBox="0 0 900 280"><g font-size="14" text-anchor="middle">
+<text x="220" y="22" font-weight="700">Vertical: life as a race</text>
+<rect x="60" y="210" width="80" height="40" fill="var(--soft)" stroke="var(--line)"/><rect x="160" y="150" width="80" height="100" fill="var(--soft)" stroke="var(--line)"/><rect x="260" y="80" width="80" height="170" fill="var(--soft)" stroke="var(--line)"/>
+<text x="100" y="200">😟 behind</text><text x="200" y="140">😐</text><text x="300" y="70">😤 ahead?</text>
+<text x="220" y="272" style="fill:var(--muted)">Others = rivals. Anxiety forever.</text>
+<text x="680" y="22" font-weight="700">Horizontal: walking a flat plane</text>
+<line x1="480" y1="200" x2="880" y2="200" stroke="var(--n2)" stroke-width="4"/>
+<text x="520" y="185" font-size="26">🚶</text><text x="610" y="185" font-size="26">🚶‍♀️</text><text x="700" y="185" font-size="26">🧑‍🦽</text><text x="790" y="185" font-size="26">🚶</text>
+<text x="680" y="110">Everyone moves forward —</text><text x="680" y="130">each from where they are.</text>
+<text x="680" y="272" style="fill:var(--muted)">Others = comrades. Compare only with your ideal self.</text></g></svg>`,
+tasks:`<svg viewBox="0 0 900 260"><g font-size="15" text-anchor="middle">
+<circle cx="330" cy="130" r="110" fill="var(--n3)" opacity=".85"/><circle cx="570" cy="130" r="110" fill="var(--n4)" opacity=".5"/>
+<text x="290" y="110" style="fill:#fff" font-weight="700">MY task</text><text x="290" y="135" style="fill:#fff" font-size="13">my choices</text><text x="290" y="155" style="fill:#fff" font-size="13">my effort</text>
+<text x="610" y="110" font-weight="700">THEIR task</text><text x="610" y="135" font-size="13">their opinion of me</text><text x="610" y="155" font-size="13">their feelings</text>
+<text x="450" y="125" font-size="26">✂️</text><text x="450" y="160" font-size="12">clean line</text>
+<text x="450" y="250" style="fill:var(--muted)">Ask: "Who ultimately receives the result of this choice?"</text></g></svg>`,
+circles:`<svg viewBox="0 0 900 300"><g font-size="14" text-anchor="middle">
+${[140,110,80,50].map((r,i)=>`<circle cx="300" cy="150" r="${r}" fill="var(--n4)" opacity="${.15+i*.18}"/>`).join('')}
+<text x="300" y="155" style="fill:#fff" font-weight="700">me</text><text x="300" y="88" font-size="12">family</text><text x="300" y="58" font-size="12">school / work</text><text x="300" y="28" font-size="12">society → universe</text>
+<g transform="translate(560,40)"><text x="140" y="0" font-weight="700">Vertical vs horizontal</text>
+<rect x="0" y="20" width="120" height="40" rx="8" fill="var(--soft)" stroke="var(--line)"/><text x="60" y="45">boss</text><rect x="0" y="110" width="120" height="40" rx="8" fill="var(--soft)" stroke="var(--line)"/><text x="60" y="135">"subordinate"</text><line x1="60" y1="62" x2="60" y2="108" stroke="var(--muted)" stroke-width="2"/><text x="60" y="180" style="fill:var(--muted)">praise / rebuke</text>
+<rect x="170" y="65" width="80" height="40" rx="8" fill="var(--n4)"/><text x="210" y="90" style="fill:#fff">you</text><rect x="280" y="65" width="80" height="40" rx="8" fill="var(--n4)"/><text x="320" y="90" style="fill:#fff">me</text><line x1="252" y1="85" x2="278" y2="85" stroke="var(--n4)" stroke-width="3"/><text x="265" y="180" style="fill:var(--muted)">thanks / encouragement</text></g></g></svg>`,
+triad:`<svg viewBox="0 0 900 300"><g font-size="15" text-anchor="middle">
+<polygon points="450,30 680,250 220,250" fill="none" stroke="var(--n5)" stroke-width="3"/>
+<circle cx="450" cy="30" r="0"/>
+<rect x="360" y="10" width="180" height="44" rx="10" fill="var(--n5)"/><text x="450" y="38" style="fill:#fff" font-weight="700">Self-acceptance</text>
+<rect x="130" y="230" width="180" height="44" rx="10" fill="var(--n5)"/><text x="220" y="258" style="fill:#fff" font-weight="700">Confidence in others</text>
+<rect x="590" y="230" width="180" height="44" rx="10" fill="var(--n5)"/><text x="680" y="258" style="fill:#fff" font-weight="700">Contribution to others</text>
+<text x="450" y="160" font-weight="700" font-size="17">Community</text><text x="450" y="182" font-weight="700" font-size="17">feeling</text>
+<text x="450" y="210" style="fill:var(--muted)" font-size="13">each strengthens the others</text></g></svg>`
+};
+
+function showNight(i){
+ const n=N[i];
+ $('#nightTabs').innerHTML=N.map((x,j)=>`<button class="btn" style="${j===i?`background:${C[j]};color:#fff;border-color:${C[j]}`:''}" onclick="showNight(${j})">Night ${j+1}</button>`).join('');
+ $('#nightBody').innerHTML=`
+ <span class="pill" style="background:${C[i]}">Night ${i+1}</span>
+ <h2>${n.t}</h2><p class="lead">${n.sub}</p>
+ <div class="card" style="border-left:6px solid ${C[i]}"><b>Big idea:</b> ${n.big}</div>
+ <h3>Visual</h3><div class="card">${D[n.diagram]}</div>
+ <h3>Compare</h3>
+ <div class="vs"><div class="card"><b>${n.vs.l[0]}</b><p>${n.vs.l[1]}</p><p class="muted">${n.vs.l[2]}</p></div><div class="mid">vs</div><div class="card" style="border-color:${C[i]}"><b style="color:${C[i]}">${n.vs.r[0]}</b><p>${n.vs.r[1]}</p><p class="muted">${n.vs.r[2]}</p></div></div>
+ <h3>Key ideas <span class="muted">(tap to expand)</span></h3>
+ ${n.keys.map(k=>`<details><summary>${k[0]}</summary><p>${k[1]}</p></details>`).join('')}
+ <div class="rw"><b>🔌 Re-wire it:</b> ${n.rw}</div>
+ <div style="display:flex;gap:8px;flex-wrap:wrap">
+  <button class="btn" id="markDone">${done.includes(i)?'✓ Studied':'Mark as studied'}</button>
+  ${i<4?`<button class="btn" onclick="showNight(${i+1})">Next night →</button>`:`<button class="btn" onclick="go('study')">Test yourself →</button>`}
+ </div>`;
+ $('#markDone').onclick=()=>{const k=done.indexOf(i);k<0?done.push(i):done.splice(k,1);store.set('done',done);drawJourney();showNight(i)};
+}
+showNight(0);
+
+/* ---------- concept map ---------- */
+const CN=[
+ {id:'tel',l:'Teleology',x:120,y:90,c:0,d:'Behaviour is driven by present goals, not past causes.'},
+ {id:'life',l:'Lifestyle',x:120,y:250,c:0,d:'Your chosen way of seeing self and world — re-choosable.'},
+ {id:'cou',l:'Courage',x:500,y:310,c:4,d:'The missing ingredient for change, for being disliked, and for being normal.'},
+ {id:'inf',l:'Inferiority',x:330,y:70,c:1,d:'Subjective feeling; healthy when it fuels growth, harmful as a complex/excuse.'},
+ {id:'comp',l:'Competition',x:330,y:210,c:1,d:'Seeing life as a race makes others enemies; drop it to see comrades.'},
+ {id:'ip',l:'Interpersonal\nproblems',x:500,y:130,c:1,d:'The root of all worries — and of all joy.'},
+ {id:'tasks',l:'Separation\nof tasks',x:700,y:80,c:2,d:'Who receives the result owns the task. Don\'t intrude; don\'t be intruded on.'},
+ {id:'rec',l:'Desire for\nrecognition',x:880,y:160,c:2,d:'Living for approval = living someone else\'s life. Deny it.'},
+ {id:'free',l:'Freedom',x:860,y:310,c:2,d:'Being disliked is the cost and proof of freedom.'},
+ {id:'hor',l:'Horizontal\nrelations',x:700,y:430,c:3,d:'Equal but different; encouragement and gratitude, not praise or rebuke.'},
+ {id:'cf',l:'Community\nfeeling',x:500,y:500,c:3,d:'Seeing others as comrades and feeling you belong. The goal of relationships.'},
+ {id:'sa',l:'Self-\nacceptance',x:260,y:430,c:4,d:'Accepting what you can\'t change and having the courage to change what you can.'},
+ {id:'conf',l:'Confidence\nin others',x:260,y:560,c:4,d:'Unconditional trust in people.'},
+ {id:'contr',l:'Contribution',x:730,y:570,c:4,d:'Feeling useful to others — the definition of happiness and the guiding star.'},
+ {id:'now',l:'Here & now',x:110,y:510,c:4,d:'Life is a series of moments; shine the light on the present.'},
+ {id:'rw',l:'Re-wiring\n(practice)',x:920,y:470,c:5,d:'Turning these ideas into habits through repeated small actions — neuroplasticity in practice.'}
+];
+const CE=[['tel','life'],['life','cou'],['inf','comp'],['inf','ip'],['comp','ip'],['ip','tasks'],['tasks','rec'],['rec','free'],['free','cou'],['tasks','hor'],['hor','cf'],['cf','sa'],['cf','conf'],['cf','contr'],['sa','now'],['contr','now'],['tel','inf'],['cou','sa'],['rw','contr'],['rw','free'],['rw','hor'],['ip','cf']];
+const cc=[...C,'var(--rw)'];
+function drawMap(sel){
+ const s=$('#cmap'),by=Object.fromEntries(CN.map(n=>[n.id,n]));
+ const linked=new Set(CE.filter(e=>e.includes(sel)).flat());
+ s.innerHTML=CE.map(([a,b])=>{const on=sel&&(a===sel||b===sel);return `<line x1="${by[a].x}" y1="${by[a].y}" x2="${by[b].x}" y2="${by[b].y}" stroke="${on?'var(--ink)':'var(--line)'}" stroke-width="${on?3:2}"/>`}).join('')+
+ CN.map(n=>{const dim=sel&&!linked.has(n.id)&&n.id!==sel;const ls=n.l.split('\n');
+  return `<g class="node" data-id="${n.id}" opacity="${dim?.3:1}"><circle cx="${n.x}" cy="${n.y}" r="${n.id===sel?58:50}" fill="${cc[n.c]}" stroke="var(--ink)" stroke-width="${n.id===sel?3:0}"/>${ls.map((t,k)=>`<text x="${n.x}" y="${n.y+5+(k-(ls.length-1)/2)*17}" text-anchor="middle" font-size="14" font-weight="700" style="fill:#fff">${t}</text>`).join('')}</g>`}).join('');
+ s.querySelectorAll('.node').forEach(g=>g.onclick=()=>{const id=g.dataset.id,n=by[id];drawMap(id);
+  $('#cinfo').innerHTML=`<b style="color:${cc[n.c]}">${n.l.replace('\n',' ')}</b> ${n.c<5?`<span class="pill" style="background:${cc[n.c]}">Night ${n.c+1}</span>`:''}<p>${n.d}</p><p class="muted">Links to: ${[...linked].filter(x=>x!==id).map(x=>by[x].l.replace('\n',' ')).join(' · ')}</p>`});
+}
+drawMap();
+
+/* ---------- task flowchart ---------- */
+const TF={
+ s:['Something is bothering you. Is it about a <b>decision or outcome</b>?',[['Yes','q1'],['No — just a feeling','feel']]],
+ q1:['Who will <b>ultimately receive the result</b> of this choice?',[['Me','mine'],['Someone else','theirs']]],
+ mine:['✅ <b>It\'s your task.</b> Decide, act, and accept the result. Others\' opinions about it are <i>their</i> task.',[['Start over','s']]],
+ theirs:['Did they <b>ask for help</b>?',[['Yes','help'],['No','hands']]],
+ help:['🤝 Offer support as an equal (horizontal). Help — but the final choice stays theirs.',[['Start over','s']]],
+ hands:['✋ <b>Their task.</b> Don\'t intrude. Let them know you\'re available — "you can lead a horse to water…"',[['Start over','s']]],
+ feel:['Ask: <b>"What goal does this feeling serve?"</b> (teleology). Is it to avoid something, or to win a power struggle?',[['Avoiding','avoid'],['Winning','win']]],
+ avoid:['🦁 This needs <b>courage</b>. Take one small step toward the life task you\'re avoiding.',[['Start over','s']]],
+ win:['🕊️ Step out of the power struggle. Admitting fault isn\'t defeat.',[['Start over','s']]]
+};
+let path=['s'];
+function drawFlow(){
+ $('#taskFlow').innerHTML=path.map((k,i)=>{const [t,ch]=TF[k],last=i===path.length-1;
+  return `${i?'<div class="arrow"></div>':''}<div class="fbox" style="border-color:${last?'var(--n3)':'var(--line)'};opacity:${last?1:.65}">${t}${last?`<div class="choices">${ch.map(([l,n])=>`<button class="btn" data-n="${n}">${l}</button>`).join('')}</div>`:''}</div>`}).join('');
+ $$('#taskFlow [data-n]').forEach(b=>b.onclick=()=>{const n=b.dataset.n;path=n==='s'?['s']:[...path,n];drawFlow()});
+}
+drawFlow();
+
+/* ---------- sorting game ---------- */
+const SI=[['Whether my colleague likes my presentation','them'],['Preparing my presentation well','me'],['My teenager doing homework','them'],['Telling my friend honestly how I feel','me'],['Whether my partner forgives me','them'],['Apologising when I\'m wrong','me'],['What strangers think of my clothes','them'],['Choosing my career','me']];
+let picked=null;
+function resetSort(){$('#pool').innerHTML=SI.map((s,i)=>`<span class="chip" data-i="${i}">${s[0]}</span>`).join('');$$('.zone div').forEach(z=>z.innerHTML='');$('#sortMsg').textContent='';bindChips()}
+function bindChips(){$$('#pool .chip').forEach(c=>c.onclick=()=>{$$('.chip').forEach(x=>x.classList.remove('sel'));c.classList.add('sel');picked=c})}
+$$('.zone').forEach(z=>z.onclick=()=>{if(!picked)return;const ok=SI[picked.dataset.i][1]===z.dataset.z;
+ if(ok){picked.classList.remove('sel');picked.onclick=null;picked.style.borderColor='var(--n3)';z.querySelector('div').append(picked);picked=null;
+  $('#sortMsg').textContent=$('#pool').children.length?'✅ Correct!':'🎉 All sorted! Who receives the result = whose task it is.'}
+ else $('#sortMsg').textContent='❌ Not quite — who ultimately receives the result?'});
+$('#sortReset').onclick=resetSort;resetSort();
+
+/* ---------- reframer ---------- */
+$('#reBtn').onclick=()=>{const v=$('#reIn').value.trim();if(!v)return;
+ const m=v.match(/i can'?t (.+?) because (.+)/i);const act=m?m[1]:'do this',cause=m?m[2].replace(/\.$/,''):'my past';
+ $('#reOut').innerHTML=`<div class="vs"><div class="card"><b>Etiology says</b><p>"${cause}" → so I can't ${act}.</p></div><div class="mid">→</div><div class="card" style="border-color:var(--n1)"><b style="color:var(--n1)">Teleology asks</b><p>What do I <i>gain</i> by not being able to ${act}? What am I protecting myself from?</p><p>What tiny step toward ${act} could I take today — with courage, not certainty?</p></div></div><div class="rw"><b>🔌 Rep:</b> Repeat this reframe each time the old sentence shows up. Repetition is what rewires it.</div>`};
+
+/* ---------- rewire lab ---------- */
+const dd=store.get('days',[]);
+$('#days').innerHTML=Array.from({length:21},(_,i)=>`<button class="btn" data-d="${i}" style="width:52px;${dd.includes(i)?'background:var(--rw);color:#fff;border-color:var(--rw)':''}">${i+1}</button>`).join('');
+$$('#days [data-d]').forEach(b=>b.onclick=()=>{const i=+b.dataset.d,k=dd.indexOf(i);k<0?dd.push(i):dd.splice(k,1);store.set('days',dd);b.style.cssText='width:52px;'+(dd.includes(i)?'background:var(--rw);color:#fff;border-color:var(--rw)':'')});
+const DL=['I noticed one "because of my past…" thought and asked "what is it for?"','I compared myself only to yesterday-me','I separated one task ("whose result is this?")','I said "thank you" instead of praising or judging','I did one small thing to contribute to someone','I spent one moment fully here & now'];
+const dc=store.get('daily',[]);
+$('#daily').innerHTML=DL.map((t,i)=>`<label class="chk"><input type="checkbox" data-c="${i}" ${dc.includes(i)?'checked':''}><span>${t}</span></label>`).join('')+'<button class="btn" id="clrDaily">Clear for new day</button>';
+$$('#daily [data-c]').forEach(c=>c.onchange=()=>{const i=+c.dataset.c,k=dc.indexOf(i);k<0?dc.push(i):dc.splice(k,1);store.set('daily',dc)});
+$('#clrDaily').onclick=()=>{dc.length=0;store.set('daily',dc);$$('#daily input').forEach(c=>c.checked=false)};
+const PR=['What excuse have I been using to avoid a life task (work, friendship, love)?','Whose expectations am I trying to live up to? What would I do if they didn\'t exist?','When did I last feel anger? What goal was it serving?','Where do I feel I belong? What larger community could I listen to?','What would "the courage to be normal" look like for me this week?','If only this moment mattered, what would I do differently right now?','Who did I contribute to today, even in a small way?'];
+let pi=0;const sp=()=>{$('#prompt').textContent='💭 '+PR[pi%PR.length]};sp();
+$('#newPrompt').onclick=()=>{pi++;sp()};
+$('#journal').value=store.get('journal','');$('#journal').oninput=e=>store.set('journal',e.target.value);
+
+/* ---------- flashcards ---------- */
+let FC=[['Teleology','We act toward present goals, not from past causes.'],['Etiology','Explaining behaviour by past causes (cause → effect).'],['Lifestyle','Your chosen way of seeing self & world. Can be re-chosen.'],['Inferiority complex','Using a feeling of inferiority as an excuse: "Because of A, I can\'t B."'],['Superiority complex','Acting superior to hide inferiority — bragging, flaunting misfortune.'],['Three life tasks','Work, friendship, love.'],['Life-lie','Excuses used to avoid life tasks.'],['Separation of tasks','Whoever receives the result of a choice owns the task.'],['Freedom','Being disliked by others — the price and proof of living freely.'],['Community feeling','Seeing others as comrades and feeling "I belong here."'],['Horizontal relationship','Equal but different; encouragement, not praise/rebuke.'],['Encouragement','Helping others find courage — e.g. with gratitude.'],['Self-acceptance','Accepting the "can\'t yet" and moving forward honestly.'],['Confidence in others','Unconditional trust (vs conditional credit).'],['Happiness','The feeling of contribution.'],['Guiding star','Contribution to others — keeps you on course.'],['Life as moments','Life is a series of "nows", like a dance — not a line to a summit.'],['Re-wiring','Repeating a new response until the brain makes it automatic.']];
+let fi=0;const fs=()=>{$('#flash').classList.remove('flip');$('#ff').textContent=FC[fi][0];$('#fb').textContent=FC[fi][1];$('#fNum').textContent=`${fi+1}/${FC.length}`};
+$('#flash').onclick=()=>$('#flash').classList.toggle('flip');
+$('#fNext').onclick=()=>{fi=(fi+1)%FC.length;fs()};$('#fPrev').onclick=()=>{fi=(fi-1+FC.length)%FC.length;fs()};
+$('#fShuf').onclick=()=>{FC.sort(()=>Math.random()-.5);fi=0;fs()};fs();
+
+/* ---------- quiz ---------- */
+const QZ=[
+['According to Adler, why does someone avoid leaving their room?',['Past trauma forces them','They create anxiety to serve a goal (not going out)','Genetics'],1],
+['A healthy feeling of inferiority compares you with…',['Your ideal self','Your neighbours','Celebrities'],0],
+['"Because of A, I can\'t do B" is an example of…',['Community feeling','An inferiority complex','Self-acceptance'],1],
+['Whose task is a child\'s studying?',['The parent\'s','The teacher\'s','The child\'s'],2],
+['What is the key question for separating tasks?',['Who is older?','Who ultimately receives the result?','Who cares more?'],1],
+['Being disliked by someone is…',['Proof you are living freely','A sign you failed','Always avoidable'],0],
+['In a horizontal relationship you…',['Praise good behaviour','Express gratitude/encouragement','Rebuke mistakes'],1],
+['The three life tasks are…',['Money, health, status','Work, friendship, love','Study, sport, art'],1],
+['Happiness, in this view, is…',['The feeling of contribution','Being special','Being recognised'],0],
+['Workaholism is described as…',['A virtue','A life-lie','Community feeling'],1],
+['Life is best seen as…',['A line to a summit','A series of moments, like a dance','A competition'],1],
+['Re-wiring a habit works best through…',['One big decision','Small, repeated practice','Waiting for motivation'],1]];
+function drawQuiz(){let score=0,ans=0;
+ $('#qWrap').innerHTML=QZ.map((q,i)=>`<div class="card q"><b>${i+1}. ${q[0]}</b>${q[1].map((o,j)=>`<button class="btn opt" data-q="${i}" data-o="${j}">${o}</button>`).join('')}</div>`).join('')+'<div class="card" id="score">Score: 0 / '+QZ.length+'</div><button class="btn" id="qr" style="margin-top:8px">Retry</button>';
+ $$('#qWrap .opt').forEach(b=>b.onclick=()=>{const q=+b.dataset.q,o=+b.dataset.o,box=$$(`[data-q="${q}"]`);if(box.some(x=>x.disabled))return;
+  box.forEach(x=>{x.disabled=true;if(+x.dataset.o===QZ[q][2])x.classList.add('ok')});if(o!==QZ[q][2])b.classList.add('no');else score++;ans++;
+  $('#score').textContent=`Score: ${score} / ${QZ.length}`+(ans===QZ.length?(score>=10?' — 🌟 Excellent!':' — review the nights and try again'):'')});
+ $('#qr').onclick=drawQuiz;}
+drawQuiz();
+$('#modeF').onclick=()=>{$('#fWrap').style.display='';$('#qWrap').style.display='none'};
+$('#modeQ').onclick=()=>{$('#fWrap').style.display='none';$('#qWrap').style.display=''};
+</script>
+</body>
+</html>
