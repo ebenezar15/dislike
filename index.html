@@ -99,7 +99,7 @@ textarea{width:100%;min-height:70px;border-radius:10px;border:1px solid var(--li
   <div class="grid" style="margin-top:16px">
     <div class="card"><b>Who is "Adler"?</b><p class="muted">Alfred Adler — the "third giant" of psychology beside Freud and Jung. His school is called <i>Individual Psychology</i>: the person is an indivisible whole that moves toward goals.</p></div>
     <div class="card"><b>The method</b><p class="muted">Socratic dialogue: the youth objects, the philosopher answers. Study tip — try to argue the youth's side, then answer it yourself.</p></div>
-    <div class="card" style="border-color:var(--rw)"><b style="color:var(--rw)">🔌 Re-wiring track</b><p class="muted">Each night ends with a pink "Re-wire" box linking the idea to habit change and neuroplasticity — how to actually practise it until it becomes automatic. See the <b>Re-wire Lab</b> tab too.</p></div>
+    <div class="card" style="border-color:var(--rw)"><b style="color:var(--rw)">🔌 Re-wiring track</b><p class="muted">Each night ends with a pink "Re-wire" box linking the idea to habit change and neuroplasticity — how to actually practise it until it becomes automatic. See the <b>Re-wire Lab</b> tab too, which links to ideas from your <a href="https://claude.ai/artifact/SwXxVptjyakDBJ7RxNbX12" target="_blank" rel="noopener">Rewiring app</a>.</p></div>
   </div>
 </section>
 
@@ -166,6 +166,51 @@ textarea{width:100%;min-height:70px;border-radius:10px;border:1px solid var(--li
     <div class="card"><span class="pill" style="background:var(--n4)">Choose anew</span><p>Pick one small, different action that serves a better goal (contribution, honesty, courage).</p></div>
     <div class="card"><span class="pill" style="background:var(--n5)">Repeat</span><p>New paths feel awkward at first. Repetition over weeks makes them the default.</p></div>
   </div>
+  <h3>The belief pipeline <span class="muted">(from the Rewiring app) × Adler</span></h3>
+  <p class="muted">The Rewiring app explains how experiences become a whole life through a chain of stages. Adler's key point fits the first link: an experience doesn't decide anything on its own. <b>The meaning you give it</b> does. Tap a stage.</p>
+  <div class="card"><svg viewBox="0 0 1000 150" id="pipe" role="img" aria-label="Belief pipeline"></svg><div id="pipeInfo" class="rw" style="margin:8px 0 0">Tap a stage above.</div></div>
+
+  <h3>Two feedback loops</h3>
+  <div class="vs">
+    <div class="card"><b>🔁 Old loop (etiology)</b>
+      <svg viewBox="0 0 300 230"><g text-anchor="middle" font-size="12">
+        <circle cx="150" cy="115" r="78" fill="none" stroke="var(--line)" stroke-width="3" stroke-dasharray="4 6"/>
+        <rect x="80" y="10" width="140" height="34" rx="8" fill="var(--soft)" stroke="var(--line)"/><text x="150" y="32">"People always leave"</text>
+        <rect x="200" y="98" width="96" height="34" rx="8" fill="var(--soft)" stroke="var(--line)"/><text x="248" y="120">Pull away first</text>
+        <rect x="80" y="186" width="140" height="34" rx="8" fill="var(--soft)" stroke="var(--line)"/><text x="150" y="208">They do drift off</text>
+        <rect x="4" y="98" width="96" height="34" rx="8" fill="var(--soft)" stroke="var(--line)"/><text x="52" y="120">"See? Proof."</text>
+        <text x="150" y="120" style="fill:var(--muted)">belief gets</text><text x="150" y="136" style="fill:var(--muted)">stronger</text></g></svg>
+    </div>
+    <div class="mid">→</div>
+    <div class="card" style="border-color:var(--rw)"><b style="color:var(--rw)">🔌 Rewired loop (teleology)</b>
+      <svg viewBox="0 0 300 230"><g text-anchor="middle" font-size="12">
+        <circle cx="150" cy="115" r="78" fill="none" stroke="var(--rw)" stroke-width="3" stroke-dasharray="4 6"/>
+        <rect x="70" y="10" width="160" height="34" rx="8" fill="var(--n1)"/><text x="150" y="32" style="fill:#fff">"What is pulling away for?"</text>
+        <rect x="196" y="98" width="100" height="34" rx="8" fill="var(--n3)"/><text x="246" y="120" style="fill:#fff">Stay, with courage</text>
+        <rect x="70" y="186" width="160" height="34" rx="8" fill="var(--n4)"/><text x="150" y="208" style="fill:#fff">Trust others, contribute</text>
+        <rect x="4" y="98" width="100" height="34" rx="8" fill="var(--n5)"/><text x="54" y="120" style="fill:#fff">"I belong here"</text>
+        <text x="150" y="120" style="fill:var(--muted)">new path gets</text><text x="150" y="136" style="fill:var(--muted)">stronger</text></g></svg>
+    </div>
+  </div>
+
+  <h3>Calm before courage: the physiological sigh</h3>
+  <p class="muted">A breathing tool from the Rewiring app's toolkit. It helps to calm your alarm system first. Then you can manage the courageous act: saying no, staying in a hard talk, or accepting being disliked.</p>
+  <div class="card" style="text-align:center">
+    <svg viewBox="0 0 200 200" style="width:180px;margin:auto"><circle id="sighC" cx="100" cy="100" r="40" fill="var(--rw)" opacity=".8" style="transition:r 1s ease-in-out"/></svg>
+    <p id="sighT" style="font-weight:700;min-height:1.5em">Press start — 3 rounds</p>
+    <button class="btn" id="sighB">▶ Start</button>
+  </div>
+
+  <h3>The 90-day Rewiring plan × the five nights</h3>
+  <p class="muted">The Rewiring app's 90-day plan has four phases. Here is which nights to re-read alongside each one.</p>
+  <div class="ladder">
+    <div style="background:var(--n1)">Phase 1 · Foundations (Days 1–21): alarm system, habits &amp; mind traps, sleep → <u>Night 1</u> (goals, not causes) + <u>Night 2</u> (inferiority as fuel)</div>
+    <div style="background:var(--n2)">Phase 2 · Emotions, anxiety &amp; trauma (Days 22–42) → <u>Night 1</u> (meaning of experiences, chosen anger) + <u>Night 5</u> (self-acceptance)</div>
+    <div style="background:var(--n3)">Phase 3 · Connection (Days 43–63): attachment, conflict, boundaries → <u>Night 3</u> (separation of tasks) + <u>Night 4</u> (horizontal relationships)</div>
+    <div style="background:var(--n5)">Phase 4 · Toolkit, performance &amp; helping (Days 64–90) → <u>Night 5</u> (contribution, here &amp; now, the guiding star)</div>
+  </div>
+  <p><a class="btn" href="https://claude.ai/artifact/SwXxVptjyakDBJ7RxNbX12" target="_blank" rel="noopener" style="text-decoration:none">Open the Rewiring app ↗</a></p>
+
   <h3>21-day micro-practice tracker</h3>
   <p class="muted">One tiny rep a day. Tick each day you did it (saved in this browser).</p>
   <div class="card" id="days" style="display:flex;flex-wrap:wrap;gap:6px"></div>
@@ -276,6 +321,16 @@ const N=[
  rw:'End each day by naming one moment you contributed (big or tiny). Repeatedly noticing contribution rewires the brain\'s "reward" cue away from approval toward usefulness — the book\'s formula for happiness.'}
 ];
 
+/* ---------- links to the Rewiring app ---------- */
+const RW_URL='https://claude.ai/artifact/SwXxVptjyakDBJ7RxNbX12';
+const RA=[
+ [['Habits and mind traps','automatic thoughts like "I am this way because…" are trained paths, and they can be re-trained.'],['Meet your alarm system','fear makes "staying the same" feel safe, which is why we choose not to change.'],['Belief pipeline','an experience only becomes a belief through the meaning we give it.']],
+ [['Self-esteem','a feeling of inferiority sits between beliefs and self-concept. Use it as fuel, not as an excuse.'],['Anxiety: mechanism and meaning','comparing yourself with others keeps the threat system switched on.'],['Conflict, repair and boundaries','step out of power struggles. Admitting fault is repair, not defeat.']],
+ [['Conflict, repair and boundaries','separating tasks is boundary-setting: you own your part, and they own theirs.'],['Understanding and influencing people','you can offer something, but you cannot force anyone to take it.'],['Emotions: name, trace, soothe','calm the fear of being disliked so you can act freely.']],
+ [['Co-regulation and attachment','belonging and community feeling are what the nervous system needs to feel safe.'],['Helping others well','encourage people as an equal instead of rescuing or praising from above.'],['Trauma and the body','a person is a whole (holism): mind, body and relationships work as one.']],
+ [['Focus, flow and sustainable performance','living like a dance means absorption in the present moment, not just chasing a summit.'],['Helping others well','contribution is the guiding star and the feeling of happiness.'],['Build your toolkit','self-acceptance is a daily practice, not a one-time insight.']]
+];
+
 /* ---------- journey map ---------- */
 const pts=[[60,260],[320,120],[560,200],[800,110],[950,90]];
 const done=store.get('done',[]);
@@ -345,7 +400,9 @@ function showNight(i){
  <div class="vs"><div class="card"><b>${n.vs.l[0]}</b><p>${n.vs.l[1]}</p><p class="muted">${n.vs.l[2]}</p></div><div class="mid">vs</div><div class="card" style="border-color:${C[i]}"><b style="color:${C[i]}">${n.vs.r[0]}</b><p>${n.vs.r[1]}</p><p class="muted">${n.vs.r[2]}</p></div></div>
  <h3>Key ideas <span class="muted">(tap to expand)</span></h3>
  ${n.keys.map(k=>`<details><summary>${k[0]}</summary><p>${k[1]}</p></details>`).join('')}
- <div class="rw"><b>🔌 Re-wire it:</b> ${n.rw}</div>
+ <div class="rw"><b>🔌 Re-wire it:</b> ${n.rw}
+  <div style="margin-top:10px"><span class="muted">Related in the <a href="${RW_URL}" target="_blank" rel="noopener">Rewiring app</a>:</span><br>${RA[i].map(([m,why])=>`<a class="chip" href="${RW_URL}" target="_blank" rel="noopener" title="${why}" style="text-decoration:none;color:inherit;border-color:var(--rw)">🧠 ${m}</a>`).join('')}
+  <ul class="muted" style="margin:6px 0 0;padding-left:18px">${RA[i].map(([m,why])=>`<li><b>${m}:</b> ${why}</li>`).join('')}</ul></div></div>
  <div style="display:flex;gap:8px;flex-wrap:wrap">
   <button class="btn" id="markDone">${done.includes(i)?'✓ Studied':'Mark as studied'}</button>
   ${i<4?`<button class="btn" onclick="showNight(${i+1})">Next night →</button>`:`<button class="btn" onclick="go('study')">Test yourself →</button>`}
@@ -421,6 +478,31 @@ $('#sortReset').onclick=resetSort;resetSort();
 $('#reBtn').onclick=()=>{const v=$('#reIn').value.trim();if(!v)return;
  const m=v.match(/i can'?t (.+?) because (.+)/i);const act=m?m[1]:'do this',cause=m?m[2].replace(/\.$/,''):'my past';
  $('#reOut').innerHTML=`<div class="vs"><div class="card"><b>Etiology says</b><p>"${cause}" → so I can't ${act}.</p></div><div class="mid">→</div><div class="card" style="border-color:var(--n1)"><b style="color:var(--n1)">Teleology asks</b><p>What do I <i>gain</i> by not being able to ${act}? What am I protecting myself from?</p><p>What tiny step toward ${act} could I take today — with courage, not certainty?</p></div></div><div class="rw"><b>🔌 Rep:</b> Repeat this reframe each time the old sentence shows up. Repetition is what rewires it.</div>`};
+
+/* ---------- belief pipeline ---------- */
+const PP=[
+ ['Experience','What happened','Adler: no experience decides you on its own. It is raw material.','Write the event as plain facts, with no labels.'],
+ ['Meaning','Interpreted as safe or threat','The step Adler highlights: <b>you give the meaning</b>. This is the lever.','Ask "What else could this mean?" and list two other meanings.'],
+ ['Belief','"The world is…"','Your lifestyle is a set of beliefs about the world and yourself. It was chosen, so it can be re-chosen.','Find one belief, e.g. "People are enemies." Test it against your day.'],
+ ['Self-concept','"I am…"','Inferiority feelings live here. Compare yourself with your ideal self, not with others.','Swap "I am not good enough" for "I am not there yet."'],
+ ['Thoughts','Automatic takes','These are mind traps and life-lies, the excuses that keep you away from life tasks.','Catch the thought and ask "What goal does it serve?"'],
+ ['Behaviour','What I do','Separate tasks: act on what is yours and leave what is theirs.','Take one small action that serves contribution.'],
+ ['Character','Who I become','Repeated choices build character, which is how re-wiring happens.','Repeat the new action for 21 days.'],
+ ['Life','The life I live','Life is a series of moments, so it is decided here and now.','Shine the light on today.']];
+function drawPipe(sel){
+ const w=118,g=6;$('#pipe').innerHTML=PP.map((p,i)=>{const x=4+i*(w+g),on=i===sel,hl=i===1;
+  return `<g class="node" data-p="${i}"><path d="M${x} 40h${w-14}l14 30l-14 30h-${w-14}${i?'l14 -30z':'z'}" fill="${on?'var(--rw)':hl?'var(--n1)':'var(--soft)'}" stroke="${hl?'var(--n1)':'var(--line)'}"/><text x="${x+w/2+4}" y="68" text-anchor="middle" font-size="14" font-weight="700" style="fill:${on||hl?'#fff':'var(--ink)'}">${p[0]}</text><text x="${x+w/2}" y="125" text-anchor="middle" font-size="11" style="fill:var(--muted)">${p[1]}</text></g>`}).join('')+'<text x="4" y="24" font-size="12" style="fill:var(--n1)" font-weight="700">▼ Adler\'s lever: meaning</text>';
+ $$('#pipe .node').forEach(n=>n.onclick=()=>{const i=+n.dataset.p,p=PP[i];drawPipe(i);$('#pipeInfo').innerHTML=`<b>${i+1}. ${p[0]}</b> — ${p[2]}<br><span class="muted">🔌 Practice: ${p[3]}</span>`});
+}
+drawPipe(-1);
+
+/* ---------- physiological sigh pacer ---------- */
+let sighOn=false;
+$('#sighB').onclick=async()=>{if(sighOn)return;sighOn=true;const c=$('#sighC'),t=$('#sighT'),w=ms=>new Promise(r=>setTimeout(r,ms));
+ for(let k=1;k<=3;k++){t.textContent=`Round ${k}: inhale through the nose…`;c.setAttribute('r',75);await w(2000);
+  t.textContent='…a second short sip of air';c.setAttribute('r',90);await w(1000);
+  t.textContent='Long, slow exhale through the mouth';c.style.transition='r 5s ease-in-out';c.setAttribute('r',40);await w(5000);c.style.transition='r 1s ease-in-out'}
+ t.textContent='Done. Now take the courageous step.';sighOn=false};
 
 /* ---------- rewire lab ---------- */
 const dd=store.get('days',[]);
